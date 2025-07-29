@@ -9,11 +9,12 @@
 	"id": "viper.custom-name",
 	"name": "Custom Name",
 	"version": "v1.0.0",
-	"developer": "Viper",
-	 "issues": {
+	"developer": "Cosmella",
+	"issues": {
 		"info": "GitHub",
 		"url": "https://github.com/Cosmella-v/Custom-Name/issues"
-	}, "links": {
+	},
+	"links": {
 		"source": "https://github.com/Cosmella-v/Custom-Name"
 	},
 	"settings": {
@@ -25,9 +26,9 @@
 		}
 	},
 	"incompatibilities": {
-			"coopeeo.customname": {
+		"coopeeo.customname": {
 			"importance": "superseded",
-			"version": "*"
+			"version": ">=v1.0.0"
 		}
 	},
 	"dependencies": {
