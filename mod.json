@@ -10,6 +10,12 @@
 	"name": "Custom Name",
 	"version": "v1.0.0",
 	"developer": "Viper",
+	 "issues": {
+		"info": "GitHub",
+		"url": "https://github.com/Cosmella-v/Custom-Name/issues"
+	}, "links": {
+		"source": "https://github.com/Cosmella-v/Custom-Name"
+	},
 	"settings": {
 		"username": {
 			"name": "Change Name",
