@@ -1,0 +1,37 @@
+{
+	"geode": "4.6.2",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "viper.custom-name",
+	"name": "Custom Name",
+	"version": "v1.0.0",
+	"developer": "Viper",
+	"settings": {
+		"username": {
+			"name": "Change Name",
+			"description": "Changes your name to what you type into the text box.",
+			"type": "string",
+			"default": "You!"
+		}
+	},
+	"incompatibilities": {
+			"coopeeo.customname": {
+			"importance": "superseded",
+			"version": "*"
+		}
+	},
+	"dependencies": {
+		"geode.node-ids": ">=v1.17.0"
+	},
+	"tags": [
+		"offline",
+		"enhancement",
+		"customization",
+		"interface"
+	],
+	"description": "Make yourself have your own name. (Only appears for yourself). Rewriten for bug fixes"
+}
