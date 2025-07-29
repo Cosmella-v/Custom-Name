@@ -1,3 +1,5 @@
+# 1.0.1 
+- fix migration crash
 # 1.0.0
 - Rewriten from coop.customname
 - data loads from old mod
