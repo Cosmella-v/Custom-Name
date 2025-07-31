@@ -2,9 +2,7 @@
 using namespace geode::prelude;
 #include <Geode/modify/MenuLayer.hpp>
 
-#ifndef GEODE_IS_MACOS
-#define HasupdateUserProfileButton
-#endif
+
 
 class $modify(MenuLayerProfileButton,MenuLayer) {
 	void UpdateUsername() {
