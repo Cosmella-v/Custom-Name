@@ -2,7 +2,7 @@
 using namespace geode::prelude;
 #include <Geode/modify/MenuLayer.hpp>
 
-
+#define HasupdateUserProfileButton
 
 class $modify(MenuLayerProfileButton,MenuLayer) {
 	void UpdateUsername() {

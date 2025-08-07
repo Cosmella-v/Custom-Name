@@ -1,5 +1,7 @@
+# 1.0.2
+- fixed android crash when level cell is loading
 # 1.0.1 
-- fix migration crash
+- fixed migration crash
 # 1.0.0
 - Rewriten from coop.customname
 - data loads from old mod
