@@ -1,5 +1,5 @@
 {
-	"geode": "4.6.2",
+	"geode": "4.8.0",
 	"gd": {
 		"win": "2.2074",
 		"android": "2.2074",
@@ -8,7 +8,7 @@
 	},
 	"id": "viper.custom-name",
 	"name": "Custom Name",
-	"version": "v1.0.2",
+	"version": "v1.1.0",
 	"developer": "Cosmella",
 	"issues": {
 		"info": "GitHub",
@@ -18,12 +18,23 @@
 		"source": "https://github.com/Cosmella-v/Custom-Name"
 	},
 	"settings": {
+		"mod-toggled": {
+			"name": "Enabled",
+			"type": "bool",
+			"default": true,
+			"description": "Toggle custom name for you, you will still be able to see other usernames from other users"
+		},
 		"username": {
 			"name": "Change Name",
 			"description": "Changes your name to what you type into the text box.",
 			"type": "string",
-			"default": "You!"
+			"default": "You!",
+			"enable-if": "mod-toggled",
+			"enable-if-description": "You can only set this if you have the mod ON!"
 		}
+	},
+	"resources": {
+		"sprites": ["res/UsernameBadge.png"]
 	},
 	"incompatibilities": {
 		"coopeeo.customname": {
@@ -32,7 +43,10 @@
 		}
 	},
 	"dependencies": {
-		"geode.node-ids": ">=v1.17.0"
+		 "hiimjasmine00.user_data_api": {
+            "version": ">=v1.2.0",
+            "importance": "suggested"
+        }
 	},
 	"tags": [
 		"offline",
@@ -40,5 +54,9 @@
 		"customization",
 		"interface"
 	],
+	"api": {
+		"include":[
+		"api/*.hpp"
+	]},
 	"description": "Make yourself have your own name. (Only appears for yourself). Rewriten for bug fixes"
 }

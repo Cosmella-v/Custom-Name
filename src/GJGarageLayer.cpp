@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/GJGarageLayer.hpp>
-
+#include "../api/api.hpp"
 using namespace geode::prelude;
 
 class $modify(GJGarageLayer) {
@@ -8,7 +8,7 @@ class $modify(GJGarageLayer) {
 	    if(!GJGarageLayer::init())
             return false;
         
-        m_usernameInput->setString(Mod::get()->getSettingValue<std::string>("username").c_str());
+        m_usernameInput->setString(Viper::CustomName::API::getLocalUsername().c_str());
 		return true;
 	}
 };

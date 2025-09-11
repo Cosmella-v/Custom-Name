@@ -3,6 +3,7 @@
 using namespace geode::prelude;
 #include <Geode/modify/SecretLayer2.hpp>
 #include <iostream>
+#include "../api/api.hpp"
 #include <string>
 
 class $modify(SecretLayer2) {
@@ -38,7 +39,7 @@ class $modify(SecretLayer2) {
 		return text;
 	}
 	void updateMessageLabel(gd::string p0) {
-		p0 = replaceUsername(p0,GJAccountManager::get()->m_username,Mod::get()->getSettingValue<std::string>("username"));
+		if (auto val = Viper::CustomName::API::getLocalUsername(); val != GJAccountManager::get()->m_username) p0 = replaceUsername(p0,GJAccountManager::get()->m_username,val);
         SecretLayer2::updateMessageLabel(p0);
 	}
 };

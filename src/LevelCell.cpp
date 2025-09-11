@@ -1,11 +1,13 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/LevelCell.hpp>
-#include "Override.hpp"
 using namespace geode::prelude;
+#include "../api/api.hpp"
 
 class $modify(LevelCell) {
     void loadFromLevel(GJGameLevel* p0) {
-        if (p0->m_accountID != GJAccountManager::get()->m_accountID) return LevelCell::loadFromLevel(p0);
-        SpoofLevel(p0, LevelCell::loadFromLevel(p0), old);
+        auto oldn = p0->m_creatorName;
+        p0->m_creatorName =  Viper::CustomName::API::getNameFromAccountID(p0->m_accountID, oldn);
+        LevelCell::loadFromLevel(p0); 
+        p0->m_creatorName = oldn;
     }
 };
