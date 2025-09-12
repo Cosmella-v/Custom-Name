@@ -55,7 +55,7 @@ namespace hiimjasmine00::user_data_api {
 				geode::ModStateFilter(mod, geode::ModEventType::Loaded));
 		}
 	};
-
+	#ifndef __viper_CustomName__ScuffedNetworkWatingForGettingData
 	/// Retrieves user data from the given node for the specified ID and converts it to the specified type. (Defaults to matjson::Value)
 	/// @param node The node to retrieve data from
 	/// @param id The ID to retrieve data for (Defaults to your mod ID)
@@ -64,16 +64,24 @@ namespace hiimjasmine00::user_data_api {
 	// (Viper addition) added it to default to the GameLevelManager
 	// todo add it to call if not cached
 	template <class T = matjson::Value>
-	inline geode::Result<T> get(cocos2d::CCNode *node = GameLevelManger(), std::string_view id = Viper::CustomName::API::ID) {
-		if (!node)
+	inline geode::Result<T> get(cocos2d::CCNode *node, int accountID=0, std::string_view id = Viper::CustomName::API::ID) {
+		if (!node) {
 			return geode::Err("Node is null");
-		
+		}
 		if (auto obj = static_cast<cocos2d::CCString *>(node->getUserObject(fmt::format("{}/{}", ID, id)))) {
 			return matjson::parseAs<T>(obj->m_sString);
 		} else {
 			return geode::Err("User object not found");
 		}
 	};
+	#else
+	inline geode::Result<matjson::Value> data(int accountid) {
+		if (auto obj = static_cast<cocos2d::CCString *>(GameLevelManger()->getUserObject(fmt::format("{}/cache/{}", Viper::CustomName::API::ID, accountid)))) {
+			return matjson::parseAs<matjson::Value>(obj->m_sString);
+		}
+		return geode::Err("User object not found");
+	};
+	#endif
 }; // namespace hiimjasmine00::user_data_api
 
 static inline geode::Mod* self() {
@@ -94,18 +102,23 @@ inline std::string getLocalUsername() {
 };
 
 inline std::string getNameFromAccountID(int accountID, std::string defaultstr = "") {
-	if (accountID == GJAccountManager::get()->m_accountID) {
+	if (/*accountID == GJAccountManager::get()->m_accountID*/false==true) {
 		if (self() && enabledLocally()) {
 			return self()->getSettingValue<std::string>("username");
 		} else {
 			return defaultstr;
 		}
 	} else {
+
 		if (!hiimjasmine00::user_data_api::isLoaded())
 			return defaultstr;
-		matjson::Value data = hiimjasmine00::user_data_api::get().unwrapOrDefault();
-		if (auto h = data.get("Name"); h.isOk()) {
-			return data["Name"].asString().unwrapOr(defaultstr);
+		#ifndef DEBUG__Scuffed__NetworkFix
+			matjson::Value data = hiimjasmine00::user_data_api::get(hiimjasmine00::user_data_api::GameLevelManger()->userInfoForAccountID(accountID),accountID,Viper::CustomName::API::ID).unwrapOrDefault();
+		#elif
+			matjson::Value data = hiimjasmine00::user_data_api::data(accountID).unwrapOrDefault();
+		#endif
+		if (auto h = data.get("name"); h.isOk()) {
+			return data["name"].asString().unwrapOr(defaultstr);
 		};
 		return defaultstr;
 	};

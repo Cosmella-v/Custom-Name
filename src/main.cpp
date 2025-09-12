@@ -25,14 +25,12 @@ class $modify(MenuLayerProfileButton,MenuLayer) {
 	#endif
 };
 
-
 #ifdef __limitLabelWidth_FINDER
 #include <Geode/modify/CCLabelBMFont.hpp>
 class $modify(CCLabelBMFont_SickandTwistedFinder,CCLabelBMFont) {
 	void limitLabelWidth(float width, float defaultScale, float minScale) {
-		if (!this->getID().empty()) {
-			log::debug("FROM {} :Width {}, defaultScale: {}, minScale: {}",this->getID(),width,defaultScale,minScale);
-		};
+		log::debug("FROM {} :Width {}, defaultScale: {}, minScale: {}",this->getID(),width,defaultScale,minScale);
+		//this->setUserObject("LabelWidthText",CCString::create(fmt::format("Width {}, defaultScale: {}, minScale: {}",width,defaultScale,minScale)));
 		CCLabelBMFont::limitLabelWidth(width,defaultScale,minScale);
 	};
 };

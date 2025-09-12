@@ -5,6 +5,11 @@ using namespace geode::prelude;
 
 #include "../api/api.hpp"
 #define ID_DONTCALLME_MYDEADNAME_I_AM_NOT_MUHAMMAD_I_AM_COSMELLA Viper::CustomName::API::usernamebadge_ID
+
+#include <hiimjasmine00.user_data_api/include/Events.hpp>
+#define USER_DATA_API_EVENTS
+#include <hiimjasmine00.user_data_api/include/UserDataAPI.hpp>
+
 class $modify(CustomNameProfile, ProfilePage) {
 	struct Fields {
 		CCMenuItemSpriteExtra *m_deadName = nullptr; // DON'T CALL ME MY DEADNAME!!!!
@@ -22,6 +27,7 @@ class $modify(CustomNameProfile, ProfilePage) {
 		    });
 	};
 	void usernameStuff() {
+		if (!this) return;
 		if (this->m_fields->m_deadName)
 			return;
 		if (!m_usernameLabel)
@@ -40,16 +46,7 @@ class $modify(CustomNameProfile, ProfilePage) {
 
 		// m_usernameLabel->addChild(deadName);
 	};
-	void loadPageFromUserInfo(GJUserScore *p0) {
-		if (!m_usernameLabel)
-			ProfilePage::loadPageFromUserInfo(p0);
-		if (auto str = Viper::CustomName::API::getNameFromAccountID(p0->m_accountID); !str.empty()) {
-			m_usernameLabel->setString(str.c_str());
-			m_usernameLabel->limitLabelWidth(160, 0.8, 0);
-			usernameStuff();
-		}
-		ProfilePage::loadPageFromUserInfo(p0);
-
+	void patchname() {
 		if (m_fields->nodeidsFix) {
 			if (auto usernameMenu = m_mainLayer->getChildByID("username-menu")) {
 				usernameMenu->updateLayout();
@@ -71,5 +68,29 @@ class $modify(CustomNameProfile, ProfilePage) {
 				this->m_fields->m_deadName->setPosition(buttonPos);
 			};
 		}
+	}
+	void loadPageFromUserInfo(GJUserScore *p0) {
+		if (!m_usernameLabel)
+			ProfilePage::loadPageFromUserInfo(p0);
+		if (auto str = Viper::CustomName::API::getNameFromAccountID(p0->m_accountID); !str.empty()) {
+			m_usernameLabel->setString(str.c_str());
+			m_usernameLabel->limitLabelWidth(160, 0.8, 0);
+			usernameStuff();
+		}
+		ProfilePage::loadPageFromUserInfo(p0);
+		#ifndef __viper_CustomName__ScuffedNetworkWatingForGettingData
+			user_data::handleProfilePage(this, [this](GJUserScore *score) {
+				if (this && m_usernameLabel && this->m_fields.self()) {
+					if (auto str = Viper::CustomName::API::getNameFromAccountID(score->m_accountID); !str.empty()) {
+						m_usernameLabel->setString(str.c_str());
+						m_usernameLabel->limitLabelWidth(160, 0.8, 0);
+						usernameStuff();
+					};
+					patchname();
+				};
+			});
+		#else
+			patchname();
+		#endif
 	};
 };
