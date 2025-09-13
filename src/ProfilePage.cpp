@@ -13,7 +13,6 @@ using namespace geode::prelude;
 class $modify(CustomNameProfile, ProfilePage) {
 	struct Fields {
 		CCMenuItemSpriteExtra *m_deadName = nullptr; // DON'T CALL ME MY DEADNAME!!!!
-		bool nodeidsFix = false;
 	};
 	void sleepwithOneEyeOpen(CCObject *xd) {
 		geode::createQuickPopup(
@@ -27,10 +26,7 @@ class $modify(CustomNameProfile, ProfilePage) {
 		    });
 	};
 	void usernameStuff() {
-		if (!this) return;
 		if (this->m_fields->m_deadName)
-			return;
-		if (!m_usernameLabel)
 			return;
 
 		CCSprite *spr = CCSprite::create("UsernameBadge.png"_spr);
@@ -42,32 +38,25 @@ class $modify(CustomNameProfile, ProfilePage) {
 		deadName->setID(ID_DONTCALLME_MYDEADNAME_I_AM_NOT_MUHAMMAD_I_AM_COSMELLA);
 		deadName->setAnchorPoint({1, 0.5});
 		this->m_fields->m_deadName = deadName;
+		deadName->setVisible(false);
 		m_buttonMenu->addChild(deadName);
-
-		// m_usernameLabel->addChild(deadName);
 	};
-	void patchname() {
-		if (m_fields->nodeidsFix) {
-			if (auto usernameMenu = m_mainLayer->getChildByID("username-menu")) {
-				usernameMenu->updateLayout();
-			}
-			CCNode *Node = this->getChildByIDRecursive("mod-badge");
-			if (!Node)
-				Node = m_usernameLabel;
-			if (this->m_fields->m_deadName) {
-				CCSize labelSize = Node->getContentSize();
-				CCPoint worldPos = Node->convertToWorldSpace({0, labelSize.height - 5.0f});
-				CCPoint buttonPos = m_buttonMenu->convertToNodeSpace(worldPos);
-				this->m_fields->m_deadName->setPosition(buttonPos);
-			};
-		} else {
-			if (this->m_fields->m_deadName) {
-				CCSize labelSize = m_usernameLabel->getContentSize();
-				CCPoint worldPos = m_usernameLabel->convertToWorldSpace({0, labelSize.height - 5.0f});
-				CCPoint buttonPos = m_buttonMenu->convertToNodeSpace(worldPos);
-				this->m_fields->m_deadName->setPosition(buttonPos);
-			};
+	void patchname(CCNode *item) {
+		if (!m_usernameLabel)
+			return;
+		if (auto usernameMenu = m_mainLayer->getChildByID("username-menu")) {
+			usernameMenu->updateLayout();
 		}
+		CCNode *Node = this->getChildByIDRecursive("mod-badge");
+		if (!Node)
+			Node = m_usernameLabel;
+
+		if (item) {
+			CCSize labelSize = Node->getContentSize();
+			CCPoint worldPos = Node->convertToWorldSpace({0, labelSize.height - 5.0f});
+			CCPoint buttonPos = m_buttonMenu->convertToNodeSpace(worldPos);
+			item->setPosition(buttonPos);
+		};
 	}
 	void loadPageFromUserInfo(GJUserScore *p0) {
 		if (!m_usernameLabel)
@@ -75,22 +64,30 @@ class $modify(CustomNameProfile, ProfilePage) {
 		if (auto str = Viper::CustomName::API::getNameFromAccountID(p0->m_accountID); !str.empty()) {
 			m_usernameLabel->setString(str.c_str());
 			m_usernameLabel->limitLabelWidth(160, 0.8, 0);
+		}
+		if (Viper::CustomName::API::hiimjasmine00::user_data_api::isLoaded()) {
 			usernameStuff();
+#ifdef __viper_CustomName__ScuffedNetworkWatingForGettingData
+			patchname(this->m_fields->m_deadName);
+#endif
 		}
 		ProfilePage::loadPageFromUserInfo(p0);
-		#ifndef __viper_CustomName__ScuffedNetworkWatingForGettingData
-			user_data::handleProfilePage(this, [this](GJUserScore *score) {
-				if (this && m_usernameLabel && this->m_fields.self()) {
+#ifndef __viper_CustomName__ScuffedNetworkWatingForGettingData
+		auto weakSelf = geode::WeakRef(this);
+		user_data::handleProfilePage(this, [weakSelf](GJUserScore *score) {
+			if (auto self = weakSelf.lock()) {
+				if (self->m_usernameLabel) {
 					if (auto str = Viper::CustomName::API::getNameFromAccountID(score->m_accountID); !str.empty()) {
-						m_usernameLabel->setString(str.c_str());
-						m_usernameLabel->limitLabelWidth(160, 0.8, 0);
-						usernameStuff();
+						self->m_usernameLabel->setString(str.c_str());
+						self->m_usernameLabel->limitLabelWidth(160, 0.8, 0);
+						if (self->m_fields->m_deadName) self->m_fields->m_deadName->setVisible(true);
 					};
-					patchname();
+					if (Viper::CustomName::API::hiimjasmine00::user_data_api::isLoaded()) {
+						if (self->m_fields->m_deadName) self->patchname(self->m_fields->m_deadName);
+					}
 				};
-			});
-		#else
-			patchname();
-		#endif
+			}
+		});
+#endif
 	};
 };

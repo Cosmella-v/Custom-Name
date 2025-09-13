@@ -1,6 +1,7 @@
 // I KNOW this isn't needed however just in case someone wants to use the apis i will be using
 // there are no hooks just pure api infact you can just use the header
 #pragma once
+#include <Geode/GeneratedPredeclare.hpp>
 #include <Geode/loader/Event.hpp>
 namespace Viper::CustomName::API {
 const std::string ID = "viper.custom-name";
@@ -37,7 +38,7 @@ namespace hiimjasmine00::user_data_api {
 		static GameLevelManager *gmanger = GameLevelManager::get();
 		return gmanger;
 	};
-	
+
 	// wait for mod
 	template <typename F>
 	static void waitforMod(F &&callback) {
@@ -49,13 +50,13 @@ namespace hiimjasmine00::user_data_api {
 				return;
 
 			new geode::EventListener(
-				[callback = std::forward<F>(callback)](geode::ModStateEvent *) {
-					callback();
-				},
-				geode::ModStateFilter(mod, geode::ModEventType::Loaded));
+			    [callback = std::forward<F>(callback)](geode::ModStateEvent *) {
+				    callback();
+			    },
+			    geode::ModStateFilter(mod, geode::ModEventType::Loaded));
 		}
 	};
-	#ifndef __viper_CustomName__ScuffedNetworkWatingForGettingData
+
 	/// Retrieves user data from the given node for the specified ID and converts it to the specified type. (Defaults to matjson::Value)
 	/// @param node The node to retrieve data from
 	/// @param id The ID to retrieve data for (Defaults to your mod ID)
@@ -64,7 +65,7 @@ namespace hiimjasmine00::user_data_api {
 	// (Viper addition) added it to default to the GameLevelManager
 	// todo add it to call if not cached
 	template <class T = matjson::Value>
-	inline geode::Result<T> get(cocos2d::CCNode *node, int accountID=0, std::string_view id = Viper::CustomName::API::ID) {
+	inline geode::Result<T> get(cocos2d::CCNode *node, int accountID = 0, std::string_view id = Viper::CustomName::API::ID) {
 		if (!node) {
 			return geode::Err("Node is null");
 		}
@@ -74,17 +75,76 @@ namespace hiimjasmine00::user_data_api {
 			return geode::Err("User object not found");
 		}
 	};
-	#else
+	// Used to get cached data from custom loading by viper.custom-name
 	inline geode::Result<matjson::Value> data(int accountid) {
 		if (auto obj = static_cast<cocos2d::CCString *>(GameLevelManger()->getUserObject(fmt::format("{}/cache/{}", Viper::CustomName::API::ID, accountid)))) {
 			return matjson::parseAs<matjson::Value>(obj->m_sString);
 		}
 		return geode::Err("User object not found");
 	};
-	#endif
+
+	
+	// viper.customname Sends a web request to playerdata.hiimjasmine00.com and caches it into itself, NOT THE SAME AS hiimjasmine's Caching system
+	template <typename F>
+	inline void CustomNameHandledcreateWeb(int target, F &&callback) {
+		geode::prelude::web::WebRequest()
+		    .get(fmt::format("https://playerdata.hiimjasmine00.com/v3/data?ids={}", target))
+		    .listen([=](geode::prelude::web::WebResponse *res) {
+						if (res->ok()) {
+							auto json = res->json().unwrapOrDefault();
+							auto data = json.get(target);
+							if (data.isOk(); auto vip = json[fmt::format("{}",target).c_str()].get("viper.custom-name")) {
+								if (vip.isOk()) {
+									auto GameLevelManger = Viper::CustomName::API::hiimjasmine00::user_data_api::GameLevelManger();
+									auto formated = fmt::format("{}/cache/{}", Viper::CustomName::API::ID, target);
+									auto path = json[fmt::format("{}",target).c_str()]["viper.custom-name"];
+									if (auto obj =  static_cast<cocos2d::CCString *>(GameLevelManger->getUserObject(formated))) {
+										obj->m_sString = path.dump();
+									} else {
+										GameLevelManger->setUserObject(
+											formated,
+											cocos2d::CCString::create(path.dump())
+										);
+									}
+									callback(path);
+								};
+							}
+						} }, [](auto prog) {}, [=] { callback(matjson::makeObject({})); });
+	}
+
+#if defined(USER_DATA_API_DEPS) || defined(USER_DATA_API_DLL)
+#include <hiimjasmine00.user_data_api/include/events/Profile.hpp>
+	template <typename F>
+	inline void handleGJScore(GJUserScore *score, F &&fn) {
+		if (!score)
+			return;
+
+		if (score->getUserObject("hiimjasmine00.user_data_api/downloading")) {
+			score->addEventListener<user_data::ProfileFilter>(fn, score->m_accountID);
+		} else
+			fn(score);
+	};
+	template <typename F>
+	inline void WaitForDataApi(int id, CCNode *node, F &&fn) {
+		if (GJUserScore *score = Viper::CustomName::API::hiimjasmine00::user_data_api::GameLevelManger()->userInfoForAccountID(id)) {
+			handleGJScore(score, [fn = std::forward<F>(fn), id](GJUserScore *gjscore) {
+				fn(get(gjscore, id).unwrapOrDefault());
+			});
+		} else {
+			if (auto data = data(id)) {
+				return fn(data.unwrapOrDefault());
+			};
+			CustomNameHandledcreateWeb(id,[fn = std::forward<F>(fn), id](matjson::Value d) {
+				fn(d);
+			});
+		};
+	};
+
+#endif
+
 }; // namespace hiimjasmine00::user_data_api
 
-static inline geode::Mod* self() {
+static inline geode::Mod *self() {
 	static geode::Mod *self = geode::Loader::get()->getLoadedMod(ID);
 	return self;
 };
@@ -95,14 +155,14 @@ inline bool enabledLocally() {
 
 inline std::string getLocalUsername() {
 	if (self() && enabledLocally()) {
-			return self()->getSettingValue<std::string>("username");
-		} else {
-			return GJAccountManager::get()->m_username;
-		};
+		return self()->getSettingValue<std::string>("username");
+	} else {
+		return GJAccountManager::get()->m_username;
+	};
 };
 
 inline std::string getNameFromAccountID(int accountID, std::string defaultstr = "") {
-	if (/*accountID == GJAccountManager::get()->m_accountID*/false==true) {
+	if (accountID == GJAccountManager::get()->m_accountID) {
 		if (self() && enabledLocally()) {
 			return self()->getSettingValue<std::string>("username");
 		} else {
@@ -112,11 +172,11 @@ inline std::string getNameFromAccountID(int accountID, std::string defaultstr = 
 
 		if (!hiimjasmine00::user_data_api::isLoaded())
 			return defaultstr;
-		#ifndef DEBUG__Scuffed__NetworkFix
-			matjson::Value data = hiimjasmine00::user_data_api::get(hiimjasmine00::user_data_api::GameLevelManger()->userInfoForAccountID(accountID),accountID,Viper::CustomName::API::ID).unwrapOrDefault();
-		#elif
-			matjson::Value data = hiimjasmine00::user_data_api::data(accountID).unwrapOrDefault();
-		#endif
+#ifndef DEBUG__Scuffed__NetworkFix
+		matjson::Value data = hiimjasmine00::user_data_api::get(hiimjasmine00::user_data_api::GameLevelManger()->userInfoForAccountID(accountID), accountID, Viper::CustomName::API::ID).unwrapOrDefault();
+#elif
+		matjson::Value data = hiimjasmine00::user_data_api::data(accountID).unwrapOrDefault();
+#endif
 		if (auto h = data.get("name"); h.isOk()) {
 			return data["name"].asString().unwrapOr(defaultstr);
 		};

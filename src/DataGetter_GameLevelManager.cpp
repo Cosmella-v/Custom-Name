@@ -1,4 +1,5 @@
 // this fucking ruins my life i might just keep it local, please don't define __viper_CustomName__ScuffedNetworkWatingForGettingData
+// this is for testing and mods built with __viper_CustomName__ScuffedNetworkWatingForGettingData will not work with other API's
 #ifdef __viper_CustomName__ScuffedNetworkWatingForGettingData
 #include "../api/api.hpp"
 #include <Geode/Geode.hpp>
@@ -24,7 +25,7 @@ std::unordered_map<std::string, std::string> parseQuery(const std::string &query
 }
 static CCArray *p_cArray_robfinished;
 static CCArray *p_cArray_customnamefinished;
-std::unordered_map<CCHttpRequest*, CCHttpResponse*> m_mapper;
+std::unordered_map<CCHttpRequest *, CCHttpResponse *> m_mapper;
 
 $execute {
 	auto x = CCArray::create();
@@ -84,7 +85,7 @@ class $modify(GameLevelManager) {
 		if (r->getType() != (int)GJHttpType::GetGJUserInfo) {
 			return GameLevelManager::onProcessHttpRequestCompleted(param_1, param_2);
 		} else {
-			
+
 			if (!p_cArray_robfinished->containsObject(r)) {
 				param_2->retain();
 				m_mapper[r] = param_2;
@@ -108,9 +109,48 @@ class $modify(CCHttpClient) {
 	void send(CCHttpRequest *req) {
 		CCHttpClient::send(req);
 		if (req->getType() == (int)GJHttpType::GetGJUserInfo) {
-			parseAccount(this,req, parseQuery(req->getRequestData()));
+			parseAccount(this, req, parseQuery(req->getRequestData()));
 		};
 	};
 };
-#endif
 // this network fix would be so scuffed
+/*#else
+
+#include "../api/api.hpp"
+#include <Geode/Geode.hpp>
+using namespace geode::prelude;
+#include <Geode/modify/GJUserScore.hpp>
+
+// robs ratelimit makes this method not a good one
+
+class Eventer : public CCNode {
+    GJUserScore* m_gj;
+    void initPost(float dt) {
+        Viper::CustomName::API::hiimjasmine00::user_data_api::GJUserScoreEvents::Spawned(m_gj, m_gj->m_accountID).post();
+        this->release();
+        this->removeFromParentAndCleanup(true);
+    };
+    public:
+    static Eventer* create(GJUserScore* h) {
+        Eventer* e = new Eventer();
+        if (e->init()) {
+            e->m_gj = h;
+            e->retain();
+            e->schedule(schedule_selector(Eventer::initPost), 1.0f);
+            return e;
+        } else {
+            delete e;
+            return nullptr;
+        };
+    };
+};
+
+class $modify(GJUserScore) {
+    bool init() {
+        if (!GJUserScore::init()) return false;
+        CCScene::get()->addChild(Eventer::create(this));
+        return true;
+    };
+};
+*/
+#endif
