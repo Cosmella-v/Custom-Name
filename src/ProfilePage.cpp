@@ -1,6 +1,7 @@
 
 #include <Geode/Geode.hpp>
 using namespace geode::prelude;
+#include <Geode/modify/CCNode.hpp>
 #include <Geode/modify/ProfilePage.hpp>
 
 #include "../api/api.hpp"
@@ -73,17 +74,23 @@ class $modify(CustomNameProfile, ProfilePage) {
 		}
 		ProfilePage::loadPageFromUserInfo(p0);
 #ifndef __viper_CustomName__ScuffedNetworkWatingForGettingData
-		auto weakSelf = geode::WeakRef(this);
+		std::shared_ptr<CustomNameProfile> profileShared(
+		    this,
+		    [](CustomNameProfile *p) { 
+				 });
+		std::weak_ptr<CustomNameProfile> weakSelf = profileShared;
 		user_data::handleProfilePage(this, [weakSelf](GJUserScore *score) {
 			if (auto self = weakSelf.lock()) {
 				if (self->m_usernameLabel) {
 					if (auto str = Viper::CustomName::API::getNameFromAccountID(score->m_accountID); !str.empty()) {
 						self->m_usernameLabel->setString(str.c_str());
 						self->m_usernameLabel->limitLabelWidth(160, 0.8, 0);
-						if (self->m_fields->m_deadName) self->m_fields->m_deadName->setVisible(true);
+						if (self->m_fields->m_deadName)
+							self->m_fields->m_deadName->setVisible(true);
 					};
 					if (Viper::CustomName::API::hiimjasmine00::user_data_api::isLoaded()) {
-						if (self->m_fields->m_deadName) self->patchname(self->m_fields->m_deadName);
+						if (self->m_fields->m_deadName)
+							self->patchname(self->m_fields->m_deadName);
 					}
 				};
 			}

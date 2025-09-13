@@ -51,7 +51,12 @@ class $modify(LevelCell) {
             }
             return;
         }
-		Viper::CustomName::API::hiimjasmine00::user_data_api::WaitForDataApi(m_level->m_accountID, this, [this,weakSelf = geode::WeakRef(this)](matjson::Value data) {
+        std::shared_ptr<LevelCell> shared_ptr(
+			this,
+			[](LevelCell* p){}
+		);
+		std::weak_ptr<LevelCell> weakSelf = shared_ptr;
+		Viper::CustomName::API::hiimjasmine00::user_data_api::WaitForDataApi(m_level->m_accountID, this, [this,weakSelf](matjson::Value data) {
             if (auto self = weakSelf.lock()) {
 				if (auto node = self->getChildByIDRecursive("creator-name")) {
                     if (auto name = node->getChildByType<CCLabelBMFont*>(0)) {

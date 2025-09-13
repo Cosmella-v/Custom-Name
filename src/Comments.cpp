@@ -33,7 +33,7 @@ class $modify(CommentCell) {
 		} else { \
 			out = typeinfo_cast<CCLabelBMFont*>(this->getChildByIDRecursive("username-label")); \
 		}
-	
+
 	void updateNameLayout(GJComment *comment, const char* name, bool isSmallRow, float unk1) {
 		CCLabelBMFont* NameLabel = nullptr;
 		GertText(NameLabel)
@@ -88,7 +88,13 @@ class $modify(CommentCell) {
 				updateNameLayout(comment, str.c_str(),this->m_height == 36.0, unk1);
 			};
 		}
-		user_data::handleCommentCell(this, [this,weakSelf = geode::WeakRef(this)](GJComment *comment) {
+		std::shared_ptr<CommentCell> shared_ptr(
+			this,
+			[](CommentCell* p){}
+		);
+		std::weak_ptr<CommentCell> weakSelf = shared_ptr;
+
+		user_data::handleCommentCell(this, [this,weakSelf](GJComment *comment) {
 			if (auto self = weakSelf.lock()) {
 				if (auto str = Viper::CustomName::API::getNameFromAccountID(comment->m_accountID); !str.empty()) {
 					//CommentCell::loadFromComment(comment);
@@ -98,9 +104,9 @@ class $modify(CommentCell) {
 						unk1 = 26.0f;
 					};
 
-					self->updateNameLayout(comment, str.c_str(),this->m_height == 36.0, unk1);
+					this->updateNameLayout(comment, str.c_str(),this->m_height == 36.0, unk1);
 				};
-			};
+			}
 		});
 	};
 };
