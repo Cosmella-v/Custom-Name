@@ -93,7 +93,9 @@ class $modify(CustomNameProfile, ProfilePage) {
 							self->patchname(self->m_fields->m_deadName);
 					}
 				};
-			}
+			} else {
+				log::debug("unlog");
+			};
 		});
 #endif
 	};
