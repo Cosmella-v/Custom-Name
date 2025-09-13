@@ -42,7 +42,7 @@ class $modify(GJLevelScoreCell) {
 
             user_data::handleLevelScoreCell(this, [this,weakSelf](GJUserScore* score) {
                 if (auto self = weakSelf.lock()) {
-                    if (auto str = Viper::CustomName::API::getNameFromAccountID(score->m_accountID); !str.empty()) {
+                    if (auto str = Viper::CustomName::API::getNameFromAccountID(score); !str.empty()) {
                         this->setName(str.c_str());
                     };
                 }

@@ -24,7 +24,7 @@ class $modify(MenuLayerProfileButton,MenuLayer) {
 		}
 	#endif
 };
-#define __limitLabelWidth_FINDER
+//#define __limitLabelWidth_FINDER
 #ifdef __limitLabelWidth_FINDER
 #include <Geode/modify/CCLabelBMFont.hpp>
 class $modify(CCLabelBMFont_SickandTwistedFinder,CCLabelBMFont) {

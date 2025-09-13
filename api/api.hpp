@@ -161,6 +161,24 @@ inline std::string getLocalUsername() {
 	};
 };
 
+inline std::string getNameFromAccountID(GJUserScore *score, std::string defaultstr = "") {
+	if (score->m_accountID == GJAccountManager::get()->m_accountID) {
+		if (self() && enabledLocally()) {
+			return self()->getSettingValue<std::string>("username");
+		} else {
+			return defaultstr;
+		}
+	} else {
+
+		if (!hiimjasmine00::user_data_api::isLoaded())
+			return defaultstr;
+		matjson::Value data = hiimjasmine00::user_data_api::get(score, score->m_accountID, Viper::CustomName::API::ID).unwrapOrDefault();
+		if (auto h = data.get("name"); h.isOk()) {
+			return data["name"].asString().unwrapOr(defaultstr);
+		};
+		return defaultstr;
+	};
+};
 inline std::string getNameFromAccountID(int accountID, std::string defaultstr = "") {
 	if (accountID == GJAccountManager::get()->m_accountID) {
 		if (self() && enabledLocally()) {

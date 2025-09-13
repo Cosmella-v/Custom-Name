@@ -82,7 +82,7 @@ class $modify(CustomNameProfile, ProfilePage) {
 		user_data::handleProfilePage(this, [weakSelf](GJUserScore *score) {
 			if (auto self = weakSelf.lock()) {
 				if (self->m_usernameLabel) {
-					if (auto str = Viper::CustomName::API::getNameFromAccountID(score->m_accountID); !str.empty()) {
+					if (auto str = Viper::CustomName::API::getNameFromAccountID(score); !str.empty()) {
 						self->m_usernameLabel->setString(str.c_str());
 						self->m_usernameLabel->limitLabelWidth(160, 0.8, 0);
 						if (self->m_fields->m_deadName)
