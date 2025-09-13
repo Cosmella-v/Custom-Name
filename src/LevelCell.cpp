@@ -10,15 +10,20 @@ using namespace geode::prelude;
 class $modify(LevelListCell) {
 	void loadFromList(GJLevelList* p0) {
 		LevelListCell::loadFromList(p0);
+        std::shared_ptr<LevelListCell> shared_ptr(
+			this,
+			[](LevelListCell* p){}
+		);
+		std::weak_ptr<LevelListCell> weakSelf = shared_ptr;
 
-		Viper::CustomName::API::hiimjasmine00::user_data_api::WaitForDataApi(p0->m_accountID, this, [this](matjson::Value data) {
-            if (this) {
+		Viper::CustomName::API::hiimjasmine00::user_data_api::WaitForDataApi(p0->m_accountID, this, [this, weakSelf](matjson::Value data) {
+            if (auto self = weakSelf.lock()) {
                 
-				if (auto node = this->getChildByIDRecursive("creator-name")) {
+				if (auto node = self->getChildByIDRecursive("creator-name")) {
                     if (auto name = node->getChildByType<CCLabelBMFont*>(0)) {
                         if (auto h = data.get("name"); h.isOk()) {
                             name->setString(data["name"].asString().unwrapOr(name->getString()).c_str());
-                            if (this->m_height > 50) {
+                            if (self->m_height > 50) {
                                 name->limitLabelWidth(140,0.7,0);
                             } else {
                                 name->limitLabelWidth(80,0.45,0);

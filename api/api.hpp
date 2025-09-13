@@ -131,8 +131,8 @@ namespace hiimjasmine00::user_data_api {
 				fn(get(gjscore, id).unwrapOrDefault());
 			});
 		} else {
-			if (auto data = data(id)) {
-				return fn(data.unwrapOrDefault());
+			if (auto data2 = data(id)) {
+				return fn(data2.unwrapOrDefault());
 			};
 			CustomNameHandledcreateWeb(id,[fn = std::forward<F>(fn), id](matjson::Value d) {
 				fn(d);
