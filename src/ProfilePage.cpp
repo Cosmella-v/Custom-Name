@@ -94,7 +94,7 @@ class $modify(CustomNameProfile, ProfilePage) {
 					}
 				};
 			} else {
-				log::debug("unlog");
+				log::info("unlog");
 			};
 		});
 #endif
