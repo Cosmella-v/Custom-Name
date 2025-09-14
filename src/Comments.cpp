@@ -54,13 +54,13 @@ class $modify(CommentCell) {
 		float widthPad = isSmallRow ? 8.0f : 12.0f;
 		float heightPad = isSmallRow ? 11.5f : 19.5f;
 
-		float xPos = ((unk1 + 10.0f) + (NameLabel->getContentSize().width * NameLabel->getScale())) + widthPad;
+		float xPos = ((unk1 + 10.0f) + (NameLabel->getContentSize().width)) + widthPad;
 
 		float unk2 = 0.0f;
 		if (auto m_pBadgeSprite = this->getChildByIDRecursive("mod-badge")) {
 			float badgeScale = isSmallRow ? 0.55f : 0.75f;
 			m_pBadgeSprite->setScale(badgeScale);
-			m_pBadgeSprite->setPosition({ xPos, m_height - heightPad });
+			m_pBadgeSprite->setPositionX(xPos);
 			unk2 = isSmallRow ? 15.0f : 22.0f;
 		}
 
@@ -68,9 +68,8 @@ class $modify(CommentCell) {
 			float percentScale = isSmallRow ? 0.48f : 0.6f;
 			m_pPercentLabel->setScale(percentScale);
 
-			xPos = (((unk1 + 10.0f) + unk2) + (NameLabel->getContentSize().width * NameLabel->getScale())) + 4.0f; 
-			cocos2d::CCPoint percentPos = { xPos, m_height - heightPad };
-			m_pPercentLabel->setPosition(percentPos);
+			xPos = (((unk1 + 10.0f) + unk2) + (NameLabel->getContentSize().width)) + 4.0f; 
+			m_pPercentLabel->setPositionX(xPos);
 		}
 	}
 

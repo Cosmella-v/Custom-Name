@@ -17,7 +17,7 @@ class $modify(GJScoreCell) {
     };
     void loadFromScore(GJUserScore* score) {
         GJScoreCell::loadFromScore(score);
-
+        
         if (auto str = Viper::CustomName::API::getNameFromAccountID(score->m_accountID); !str.empty()) {
             setName(str.c_str());
         };
