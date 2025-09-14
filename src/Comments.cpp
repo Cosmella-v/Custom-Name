@@ -94,7 +94,8 @@ class $modify(CommentCell) {
 		);
 		std::weak_ptr<CommentCell> weakSelf = shared_ptr;
 
-		user_data::handleCommentCell(this, [this,weakSelf](GJComment *comment) {
+		user_data::handleCommentCell(this, [this,weakSelf,shared_ptr](GJComment *comment) {
+			auto x = shared_ptr;
 			if (auto self = weakSelf.lock()) {
 				if (auto str = Viper::CustomName::API::getNameFromAccountID(comment->m_accountID); !str.empty()) {
 					//CommentCell::loadFromComment(comment);

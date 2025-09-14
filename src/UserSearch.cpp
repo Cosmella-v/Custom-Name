@@ -29,7 +29,8 @@ class $modify(GJScoreCell) {
                     });
             std::weak_ptr<GJScoreCell> weakSelf = item;
 
-            user_data::handleScoreCell(this, [this,weakSelf](GJUserScore* score) {
+            user_data::handleScoreCell(this, [this,weakSelf,item](GJUserScore* score) {
+                auto x = item;
                 if (auto self = weakSelf.lock()) {
                     if (auto str = Viper::CustomName::API::getNameFromAccountID(score); !str.empty()) {
                         this->setName(str.c_str());

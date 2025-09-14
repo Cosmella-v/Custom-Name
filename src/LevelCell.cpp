@@ -16,7 +16,8 @@ class $modify(LevelListCell) {
 		);
 		std::weak_ptr<LevelListCell> weakSelf = shared_ptr;
 
-		Viper::CustomName::API::hiimjasmine00::user_data_api::WaitForDataApi(p0->m_accountID, this, [this, weakSelf](matjson::Value data) {
+		Viper::CustomName::API::hiimjasmine00::user_data_api::WaitForDataApi(p0->m_accountID, this, [this, weakSelf,shared_ptr](matjson::Value data) {
+            auto x = shared_ptr;
             if (auto self = weakSelf.lock()) {
                 
 				if (auto node = self->getChildByIDRecursive("creator-name")) {

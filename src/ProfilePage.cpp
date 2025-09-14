@@ -79,7 +79,8 @@ class $modify(CustomNameProfile, ProfilePage) {
 		    [](CustomNameProfile *p) { 
 				 });
 		std::weak_ptr<CustomNameProfile> weakSelf = profileShared;
-		user_data::handleProfilePage(this, [weakSelf](GJUserScore *score) {
+		user_data::handleProfilePage(this, [weakSelf,profileShared](GJUserScore *score) {
+			auto x = profileShared;
 			if (auto self = weakSelf.lock()) {
 				if (self->m_usernameLabel) {
 					if (auto str = Viper::CustomName::API::getNameFromAccountID(score); !str.empty()) {
@@ -93,9 +94,7 @@ class $modify(CustomNameProfile, ProfilePage) {
 							self->patchname(self->m_fields->m_deadName);
 					}
 				};
-			} else {
-				log::info("unlog");
-			};
+			}
 		});
 #endif
 	};
