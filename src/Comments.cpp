@@ -17,7 +17,6 @@ class $modify(GameLevelManager) {
 	};
 };
 
-#ifndef __viper_CustomName__ScuffedNetworkWatingForGettingData
 #include <hiimjasmine00.user_data_api/include/Events.hpp>
 #define USER_DATA_API_EVENTS
 #include <Geode/modify/CommentCell.hpp>
@@ -75,29 +74,13 @@ class $modify(CommentCell) {
 
 
 	void loadFromComment(GJComment *comment) {
-		CommentCell::loadFromComment(comment);
-		if (!Viper::CustomName::API::hiimjasmine00::user_data_api::isLoaded()) {
-			if (auto str = Viper::CustomName::API::getNameFromAccountID(comment->m_accountID); !str.empty()) {
-				float unk1 = 0.0f;
-				if (this->getChildByIDRecursive("player-icon"))
-				{
-					unk1 = 26.0f;
-				};
+		OnlineOnly_Call(CommentCell::loadFromComment(comment));
+		CreateSharedandWeak(sharedptr, weakSelf)
 
-				updateNameLayout(comment, str.c_str(),this->m_height == 36.0, unk1);
-			};
-		}
-		std::shared_ptr<CommentCell> shared_ptr(
-			this,
-			[](CommentCell* p){}
-		);
-		std::weak_ptr<CommentCell> weakSelf = shared_ptr;
-
-		user_data::handleCommentCell(this, [this,weakSelf,shared_ptr](GJComment *comment) {
-			auto x = shared_ptr;
+		user_data::handleCommentCell(this, [this,weakSelf,sharedptr](GJComment *comment) {
+			auto x = sharedptr;
 			if (auto self = weakSelf.lock()) {
 				if (auto str = Viper::CustomName::API::getNameFromAccountID(comment->m_accountID); !str.empty()) {
-					//CommentCell::loadFromComment(comment);
 					float unk1 = 0.0f;
 					if (self->getChildByIDRecursive("player-icon"))
 					{
@@ -110,4 +93,3 @@ class $modify(CommentCell) {
 		});
 	};
 };
-#endif

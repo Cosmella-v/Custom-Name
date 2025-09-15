@@ -9,7 +9,7 @@ using namespace geode::prelude;
 
 auto saved = matjson::makeObject({});
 void SendData() {
-	if (Viper::CustomName::API::hiimjasmine00::user_data_api::isLoaded()) {
+	if (Viper::CustomName::API::hiimjasmine00::user_data_api::ConnectedToServer()) {
 		user_data::upload(saved);
 	};
 };

@@ -8,7 +8,7 @@
 	},
 	"id": "viper.custom-name",
 	"name": "Custom Name",
-	"version": "v1.1.0",
+	"version": "v1.1.1",
 	"developer": "Cosmella",
 	"issues": {
 		"info": "GitHub",
@@ -19,10 +19,18 @@
 	},
 	"settings": {
 		"mod-toggled": {
-			"name": "Enabled",
+			"name": "Enable Local Username",
 			"type": "bool",
 			"default": true,
 			"description": "Toggle custom name for you, you will still be able to see other usernames from other users"
+		},
+		"server-function": {
+			"name": "Server Enabled",
+			"type": "bool",
+			"default": true,
+			"enable-if": "loaded:hiimjasmine00.user_data_api",
+			"enable-if-description": "You already have the server mode OFF!",
+			"description": "Enable or disable the user data API"
 		},
 		"username": {
 			"name": "Change Name",

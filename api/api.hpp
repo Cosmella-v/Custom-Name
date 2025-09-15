@@ -7,6 +7,11 @@ namespace Viper::CustomName::API {
 const std::string ID = "viper.custom-name";
 const std::string usernamebadge_ID = "viper.custom-name/deadName";
 
+static inline geode::Mod *self() {
+	static geode::Mod *self = geode::Loader::get()->getLoadedMod(ID);
+	return self;
+};
+
 namespace hiimjasmine00::user_data_api {
 	/* MIT License
 
@@ -31,9 +36,15 @@ namespace hiimjasmine00::user_data_api {
 	SOFTWARE.
 	*/
 	const std::string ID = "hiimjasmine00.user_data_api";
+
 	inline bool isLoaded() {
 		return (geode::Loader::get()->getLoadedMod(hiimjasmine00::user_data_api::ID) != nullptr);
 	};
+
+	inline bool ConnectedToServer() {
+		return Viper::CustomName::API::self()->getSettingValue<bool>("server-function") && isLoaded();
+	};
+
 	inline GameLevelManager *GameLevelManger() {
 		static GameLevelManager *gmanger = GameLevelManager::get();
 		return gmanger;
@@ -83,7 +94,6 @@ namespace hiimjasmine00::user_data_api {
 		return geode::Err("User object not found");
 	};
 
-	
 	// viper.customname Sends a web request to playerdata.hiimjasmine00.com and caches it into itself, NOT THE SAME AS hiimjasmine's Caching system
 	template <typename F>
 	inline void CustomNameHandledcreateWeb(int target, F &&callback) {
@@ -134,7 +144,7 @@ namespace hiimjasmine00::user_data_api {
 			if (auto data2 = data(id)) {
 				return fn(data2.unwrapOrDefault());
 			};
-			CustomNameHandledcreateWeb(id,[fn = std::forward<F>(fn), id](matjson::Value d) {
+			CustomNameHandledcreateWeb(id, [fn = std::forward<F>(fn), id](matjson::Value d) {
 				fn(d);
 			});
 		};
@@ -143,11 +153,6 @@ namespace hiimjasmine00::user_data_api {
 #endif
 
 }; // namespace hiimjasmine00::user_data_api
-
-static inline geode::Mod *self() {
-	static geode::Mod *self = geode::Loader::get()->getLoadedMod(ID);
-	return self;
-};
 
 inline bool enabledLocally() {
 	return self()->getSettingValue<bool>("mod-toggled");
@@ -190,11 +195,7 @@ inline std::string getNameFromAccountID(int accountID, std::string defaultstr = 
 
 		if (!hiimjasmine00::user_data_api::isLoaded())
 			return defaultstr;
-#ifndef DEBUG__Scuffed__NetworkFix
 		matjson::Value data = hiimjasmine00::user_data_api::get(hiimjasmine00::user_data_api::GameLevelManger()->userInfoForAccountID(accountID), accountID, Viper::CustomName::API::ID).unwrapOrDefault();
-#elif
-		matjson::Value data = hiimjasmine00::user_data_api::data(accountID).unwrapOrDefault();
-#endif
 		if (auto h = data.get("name"); h.isOk()) {
 			return data["name"].asString().unwrapOr(defaultstr);
 		};
@@ -221,3 +222,26 @@ static void waitforMod(F &&callback) {
 };
 
 } // namespace Viper::CustomName::API
+
+// #define __ViperCustomNameBringMacros before including this to get the macros
+#ifdef __ViperCustomNameBringMacros
+
+#define OnlineOnly_Call(call)                                                    \
+	if (!Viper::CustomName::API::hiimjasmine00::user_data_api::ConnectedToServer()) \
+		return call;                                                              \
+	else                                                                          \
+		call;
+
+#define OnlineOnly_CallOut(call, out)                                            \
+	if (!Viper::CustomName::API::hiimjasmine00::user_data_api::ConnectedToServer()) \
+		return call;                                                              \
+	else                                                                          \
+		out = call;
+
+#define CreateSharedandWeak(sharedVar, weakVar)                                \
+	this->retain();                                                            \
+	std::shared_ptr<std::remove_pointer_t<decltype(this)>> sharedVar(          \
+	    this, [](std::remove_pointer_t<decltype(this)> *p) { p->release(); }); \
+	std::weak_ptr<std::remove_pointer_t<decltype(this)>> weakVar = sharedVar;
+
+#endif
