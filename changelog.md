@@ -1,3 +1,5 @@
+# 1.1.2
+- overcharge main menu fix!
 # 1.1.1
 - added offline mode (allows the mod to work without connecting to user data api server)
 - fixed some crashing
